@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import chroma from 'chroma-js';
-
+import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
+
+// Extend colord with the names plugin
+extend([namesPlugin]);
 
 // --- Helper Functions ---
 const componentToHex = (c: number): string => {
@@ -245,17 +248,30 @@ export const App: React.FC = () => {
         if (isNaN(r) || isNaN(g) || isNaN(b)) return;
 
         const hex = rgbToHex(r, g, b);
-        let colorName = '';
+        let colorName: string | undefined = '';
 
         try {
-            colorName = chroma(hex).name();
+            // Attempt to get the color name using colord
+            colorName = colord(hex).toName();
         } catch (e) {
-            // This is expected. Chroma.js throws an error if no close color name is found.
-            // We'll leave colorName empty and use the hex code as a fallback.
+            // if colord fails or doesn't find a name, it might throw or return undefined
+            // console.warn("Could not find color name with colord:", e);
+            colorName = undefined; // Ensure it's undefined if an error occurs
+        }
+
+        // If colord didn't find a name, try with chroma-js as a fallback
+        if (!colorName) {
+            try {
+                colorName = chroma(hex).name();
+            } catch (e) {
+                // This is expected if chroma-js also doesn't find a close color name.
+                // We'll leave colorName undefined/empty and use the hex code as a fallback.
+                // console.warn("Chroma.js also couldn't find a name for:", hex);
+            }
         }
 
         // Capitalize each word in the name (e.g., "light blue" becomes "Light Blue").
-        // If no name was found, use the hex value as the primary display name.
+        // If no name was found by either library, use the hex value as the primary display name.
         const displayName = colorName
             ? colorName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
             : hex.toUpperCase();
