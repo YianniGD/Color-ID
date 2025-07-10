@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import chroma from 'chroma-js';
 
+import namesPlugin from 'colord/plugins/names';
+
 // --- Helper Functions ---
 const componentToHex = (c: number): string => {
   const hex = c.toString(16);
@@ -29,8 +31,8 @@ interface CrosshairProps {
 }
 
 const Crosshair: React.FC<CrosshairProps> = ({ position, isFrozen }) => (
-    <div 
-        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20 transition-transform duration-200 ease-in-out" 
+    <div
+        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20 transition-transform duration-200 ease-in-out"
         style={{ left: `${position.x * 100}%`, top: `${position.y * 100}%` }}
         aria-hidden="true"
     >
@@ -45,26 +47,26 @@ interface ColorInfoPanelProps {
 }
 
 const ColorInfoPanel: React.FC<ColorInfoPanelProps> = ({ colorData }) => {
-    const defaultColor: AppColorData = { 
-        name: 'Aim at a color', 
-        hex: '#2d3748', 
-        rgb: 'rgb(45, 55, 72)', 
-        r: 45, g: 55, b: 72 
+    const defaultColor: AppColorData = {
+        name: 'Aim at a color',
+        hex: '#2d3748',
+        rgb: 'rgb(45, 55, 72)',
+        r: 45, g: 55, b: 72
     };
-    
+
     const displayData = colorData || defaultColor;
     const transitionClasses = "transition-colors duration-500 ease-in-out";
 
     return (
-        <div 
+        <div
             className="absolute bottom-0 left-0 right-0 p-4 bg-gray-900/80 backdrop-blur-md rounded-t-2xl shadow-2xl z-30"
             role="status"
             aria-live="polite"
             aria-atomic="true"
         >
             <div className="flex flex-col sm:flex-row items-center gap-5">
-                <div 
-                    style={{ backgroundColor: displayData.hex }} 
+                <div
+                    style={{ backgroundColor: displayData.hex }}
                     className={`w-24 h-24 rounded-2xl border-4 border-white/50 shrink-0 ${transitionClasses}`}
                     aria-label={`Color swatch for ${displayData.name}`}
                 />
@@ -92,18 +94,31 @@ interface CameraControlsProps {
 const CameraControls: React.FC<CameraControlsProps> = ({ isCameraOn, isFrozen, onToggleCamera, onToggleFreeze }) => {
     return (
         <div className="absolute bottom-48 sm:bottom-44 left-1/2 -translate-x-1/2 flex items-center gap-4 z-30 bg-black/40 p-3 rounded-full backdrop-blur-sm pointer-events-auto">
-            <button 
-                onClick={onToggleCamera} 
+            <button
+                onClick={onToggleCamera}
                 className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${isCameraOn ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white`}
                 aria-label={isCameraOn ? 'Turn camera off' : 'Turn camera on'}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM4 10a1 1 0 01-1-1H2a1 1 0 110-2h1a1 1 0 011 1zM16 10a1 1 0 01-1-1h-1a1 1 0 110-2h1a1 1 0 011 1zM9 16a1 1 0 112 0v1a1 1 0 11-2 0v-1zM4.226 5.636a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414l-.707-.707zM14.364 15.774a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 011.414-1.414l.707.707zM15.774 4.226a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zM5.636 14.364a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414l-.707-.707zM10 6a4 4 0 100 8 4 4 0 000-8z" />
+                {/* NEW CAMERA OFF ICON */}
+                <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 42.58 39.31">
+                  <defs>
+                    <style dangerouslySetInnerHTML={{ __html: `
+                      .cls-1 {
+                        fill: #f2f2f2;
+                        isolation: isolate;
+                      }
+                    ` }} />
+                  </defs>
+                  <g id="Layer_1-2" data-name="Layer 1">
+                    <g id="ui_buttonCircle_light">
+                      <path class="cls-1" d="M21.29,10.06c5.23.06,9.43,4.35,9.37,9.59,0,0,0,0,0,0,0,1.11-.19,2.21-.56,3.25l5.08,5.08c2.85-2.07,5.35-4.58,7.41-7.44,0,0-8.09-13.99-21.19-13.99-2.21.01-4.39.41-6.46,1.18l2.98,2.98c1.08-.43,2.22-.65,3.38-.66ZM21.29,29.25c-5.23-.06-9.43-4.35-9.37-9.59,0,0,0,0,0,0,0-1.11.19-2.21.56-3.25l-4.62-4.61c-3.07,2.48-5.72,5.43-7.86,8.74,0,0,8.29,12.22,21.39,12.22,2.18,0,4.35-.35,6.43-1.02l-3.14-3.14c-1.08.43-2.22.65-3.38.66ZM26.33,18.01c0-.96-.78-1.73-1.74-1.74-.3,0-.6.1-.85.27l2.33,2.33c.16-.26.25-.56.26-.86ZM1.88,1.4L3.04.24c.32-.32.84-.32,1.16,0l36.51,36.51c.32.32.32.84,0,1.16l-1.16,1.16c-.32.32-.84.32-1.16,0L1.88,2.56c-.32-.32-.32-.84,0-1.16Z"/>
+                    </g>
+                  </g>
                 </svg>
             </button>
             {isCameraOn && (
-                <button 
-                    onClick={onToggleFreeze} 
+                <button
+                    onClick={onToggleFreeze}
                     className="w-14 h-14 rounded-full flex items-center justify-center bg-sky-500 hover:bg-sky-600 text-white transition-colors"
                     aria-label={isFrozen ? 'Resume live view' : 'Freeze frame'}
                 >
@@ -127,7 +142,7 @@ export const App: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const freezeFrameCanvasRef = useRef<HTMLCanvasElement>(null);
     const samplingCanvasRef = useRef<HTMLCanvasElement>(null);
-    
+
     const [colorData, setColorData] = useState<AppColorData | null>(null);
     const [isCameraOn, setIsCameraOn] = useState(false);
     const [isFrozen, setIsFrozen] = useState(false);
@@ -151,12 +166,12 @@ export const App: React.FC = () => {
         if (isCameraOn) return;
         setIsStartingCamera(true);
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
                     facingMode: 'environment',
                     width: { ideal: 1920 },
                     height: { ideal: 1080 }
-                } 
+                }
             });
             streamRef.current = stream;
             if (videoRef.current) {
@@ -172,7 +187,7 @@ export const App: React.FC = () => {
             setIsStartingCamera(false);
         }
     }, [isCameraOn]);
-    
+
     const handleToggleCamera = useCallback(() => {
       if (isCameraOn) {
         stopCamera();
@@ -231,7 +246,7 @@ export const App: React.FC = () => {
 
         const hex = rgbToHex(r, g, b);
         let colorName = '';
-        
+
         try {
             colorName = chroma(hex).name();
         } catch (e) {
@@ -267,7 +282,7 @@ export const App: React.FC = () => {
                 const context = canvas.getContext('2d');
                 context?.drawImage(video, 0, 0, canvas.width, canvas.height);
                 setCrosshairPosition({ x: 0.5, y: 0.5 });
-                setTimeout(captureColor, 0); 
+                setTimeout(captureColor, 0);
             } else {
                 video.play();
             }
@@ -305,24 +320,24 @@ export const App: React.FC = () => {
                 className={`w-full h-full object-cover transition-opacity duration-300 ${isCameraOn ? 'opacity-100' : 'opacity-0'}`}
                 aria-label="Live camera feed"
             ></video>
-            
-            <canvas 
-                ref={freezeFrameCanvasRef} 
+
+            <canvas
+                ref={freezeFrameCanvasRef}
                 className={`w-full h-full object-contain absolute inset-0 transition-opacity duration-200 ${isFrozen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={handleCanvasClick}
             ></canvas>
-            
+
             <canvas ref={samplingCanvasRef} width="1" height="1" className="hidden"></canvas>
-            
+
             {isCameraOn && <Crosshair position={crosshairPosition} isFrozen={isFrozen} />}
-            
+
             <div className="absolute inset-0 z-30 pointer-events-none">
               <div className="relative w-full h-full">
                 <ColorInfoPanel colorData={colorData} />
                 {isCameraOn && <CameraControls isCameraOn={isCameraOn} isFrozen={isFrozen} onToggleCamera={handleToggleCamera} onToggleFreeze={handleToggleFreeze} />}
               </div>
             </div>
-            
+
             {isStartingCamera && (
                 <div className="absolute inset-0 bg-gray-900/80 flex flex-col items-center justify-center text-white z-40">
                     <svg className="animate-spin h-8 w-8 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -335,8 +350,22 @@ export const App: React.FC = () => {
              {!isCameraOn && !isStartingCamera && (
                 <div className="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center text-white z-20">
                      <button onClick={handleToggleCamera} className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-full flex items-center gap-3 text-lg transition-transform hover:scale-105">
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                         {/* NEW CAMERA ON ICON */}
+                         <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 42.58 26.2">
+                           <defs>
+                             <style dangerouslySetInnerHTML={{ __html: `
+                               .cls-1 {
+                                 fill: #f2f2f2;
+                                 fill-rule: evenodd;
+                                 isolation: isolate;
+                               }
+                             ` }} />
+                           </defs>
+                           <g id="Layer_1-2" data-name="Layer 1">
+                             <g id="ui_buttonCircle_light">
+                               <path class="cls-1" d="M22.89,11.46c0-.95.75-1.73,1.7-1.74,0,0,0,0,0,0,.96,0,1.73.78,1.74,1.74,0,.95-.76,1.73-1.72,1.74,0,0-.01,0-.02,0-.94,0-1.7-.75-1.7-1.69,0-.01,0-.03,0-.04ZM0,13.99s8.29,12.22,21.39,12.22,21.19-12.22,21.19-12.22c0,0-8.09-13.99-21.19-13.99S0,13.99,0,13.99ZM11.92,13.1c.12-5.17,4.42-9.27,9.59-9.14s9.27,4.42,9.14,9.59c-.12,5.09-4.28,9.14-9.37,9.14-5.23-.06-9.43-4.35-9.37-9.59,0,0,0,0,0,0Z"/>
+                             </g>
+                           </g>
                          </svg>
                          Start Camera
                      </button>
